@@ -2,6 +2,7 @@ import requests
 from datetime import datetime
 import hashlib
 import json
+from typing import List
 
 base_url = "http://api.smitegame.com/smiteapi.svc/"
 devId = 'YOUR DEV ID'
@@ -11,12 +12,13 @@ response_frmt = 'Json'
 
 class SmiteAPI:
 
-    def __init__(self, dev_id, auth_key):
+    def __init__(self, dev_id: str, auth_key: str):
         """Session is not created until a request is made"""
         self.dev_id = dev_id
         self.auth_key = auth_key
         self.base_url = base_url
         self.session_id = None
+        self.lang_code = '1'
 
     def _create_timestamp(self) -> str:
         """Creates the current timestamp formatted properly"""
@@ -62,22 +64,45 @@ class SmiteAPI:
         else:
             self.create_session()
 
-    def create_url(self, methodname, params=()):
+    def create_url(self, methodname, params=()) -> str:
         """Builds and returns the url to be requested when given the parameters and methodname"""
         signature = self._create_signature(methodname)
         timestamp = self._create_timestamp()
         partial_url = [methodname + response_frmt, self.dev_id, signature, self.session_id, timestamp]
         if params:
             for param in params:
-                partial_url.append(str(param))
-        return base_url + '/'.join(partial_url) + '/1'
+                if type(param) == list:
+                    partial_url.append(str(param[0]))
+                else:
+                    partial_url.append(str(param))
+        return base_url + '/'.join(partial_url)
 
-    def get_gods(self):
-        """Pulls Json of every God and their stats"""
-        data = self.create_request('getgods')
+    def get_gods(self) -> list:
+        """Return Json of every God and their stats"""
+        data = self.create_request('getgods', [self.lang_code])
         return data
 
-    def get_player(self, player_name: list) -> list:
-        """Pulls Json of requested player"""
+    def get_player(self, player_name: List[str]) -> list:
+        """Return Json of a requested player by name"""
         data = self.create_request('getplayer', player_name)
+        return data
+
+    def get_god_skins(self, god_id: List[str]):
+        """Return Json of all skins for particular god by ID"""
+        data = self.create_request('getgodskins', [god_id, [self.lang_code]])
+        return data
+
+    def get_god_leaderboard(self, god_id: List[str], queue: List[str]) -> list:
+        """Return Json leaderboard data for a specific god and queue"""
+        data = self.create_request('getgodleaderboard', [god_id, queue])
+        return data
+
+    def get_god_recommended_items(self, god_id: List[str]) -> list:
+        """Return recommended items for a particular god by ID"""
+        data = self.create_request('getgodrecommendeditems', [god_id, self.lang_code])
+        return data
+
+    def get_items(self) -> list:
+        """Return all items in Smite"""
+        data = self.create_request('getitems', [self.lang_code])
         return data
