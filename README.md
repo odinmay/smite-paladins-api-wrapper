@@ -1,4 +1,3 @@
-marked(markdown, { breaks: true })
 # smite-paladins-api-wrapper
 #
 #
