@@ -4,23 +4,31 @@ import hashlib
 import json
 from typing import List
 
-base_url = "http://api.smitegame.com/smiteapi.svc/"
+
 devId = 'YOUR DEV ID'
 authKey = 'YOUR AUTH KEY'
-response_frmt = 'Json'
 
 
 class SmiteAPI:
+    base_url = 'http://api.smitegame.com/smiteapi.svc/'
+    response_frmt = 'Json'
 
     def __init__(self, dev_id: str, auth_key: str):
         """Session is not created until a request is made"""
         self.dev_id = dev_id
         self.auth_key = auth_key
-        self.base_url = base_url
+        self.base_url = SmiteAPI.base_url
         self.session_id = None
         self.lang_code = '1'
 
-    def _create_timestamp(self) -> str:
+    @staticmethod
+    def ping() -> str:
+        """A quick way of validating access to the Hi-Rez API"""
+        data = requests.get(f'{SmiteAPI.base_url}/ping{SmiteAPI.response_frmt}')
+        return data.text
+
+    @staticmethod
+    def _create_timestamp() -> str:
         """Creates the current timestamp formatted properly"""
         current_datetime = datetime.utcnow()
         return current_datetime.strftime("%Y%m%d%H%M%S")
@@ -44,7 +52,7 @@ class SmiteAPI:
             self._create_session()
             return True
         else:
-            url = f"{base_url}testsession{response_frmt}/{self.dev_id}/" \
+            url = f"{self.base_url}testsession{SmiteAPI.response_frmt}/{self.dev_id}/" \
                   f"{self._create_signature('testsession')}/{self.session_id}/{self._create_timestamp()}"
             req = requests.get(url)
             if 'successful' in req.text:
@@ -68,14 +76,25 @@ class SmiteAPI:
         """Builds and returns the url to be requested when given the parameters and methodname"""
         signature = self._create_signature(methodname)
         timestamp = self._create_timestamp()
-        partial_url = [methodname + response_frmt, self.dev_id, signature, self.session_id, timestamp]
+        partial_url = [methodname + SmiteAPI.response_frmt, self.dev_id, signature, self.session_id, timestamp]
         if params:
             for param in params:
                 if type(param) == list:
                     partial_url.append(str(param[0]))
                 else:
                     partial_url.append(str(param))
-        return base_url + '/'.join(partial_url)
+        return self.base_url + '/'.join(partial_url)
+
+    def get_data_used(self) -> list:
+        """Returns API Developer daily usage limits and the current status against those limits"""
+        data = self._create_request('getdataused')
+        return data
+
+    def get_server_status(self) -> list:
+        """Function returns UP/DOWN status for the primary game/platform environments
+          Data is cached once a minute"""
+        data = self._create_request('gethirezserverstatus')
+        return data
 
     def get_patch_info(self) -> dict:
         """Function returns information about current deployed patch.
@@ -113,6 +132,11 @@ class SmiteAPI:
         data = self._create_request('getplayer', [player_name])
         return data
 
+    def search_players(self, player_name: List[str]) -> list:
+        """Returns player_id values for all names and/or gamer_tags containing the “searchPlayer” string"""
+        data = self._create_request('searchplayers', [player_name])
+        return data
+
     def get_player_id(self, player_name: List[str]) -> list:
         """Returns a player id, which is used for other function calls"""
         data = self._create_request('getplayeridbyname', [player_name])
@@ -121,27 +145,48 @@ class SmiteAPI:
         except KeyError:
             print('Player not found')
 
-    def get_friends(self, player_id: list) -> list:
+    def get_friends(self, player_id: List[str]) -> list:
         """Returns the Smite User names of each of the player’s friends. [PC only]"""
         data = self._create_request('getfriends', [player_id])
         return data
 
-    def get_god_ranks(self, player_id: list) -> list:
+    def get_god_ranks(self, player_id: List[str]) -> list:
         """Returns the Rank and Worshippers value for each God a player has played"""
         data = self._create_request('getgodranks', [player_id])
         return data
 
-    def get_player_achievements(self, player_id: list) -> dict:
+    def get_player_achievements(self, player_id: List[str]) -> dict:
         """Returns select achievement totals for the specified playerId"""
         data = self._create_request('getplayerachievements', [player_id])
         return data
 
-    def get_player_status(self, player_id: list) -> list:
+    def get_player_status(self, player_id: List[str]) -> list:
         """Returns players current online status"""
         data = self._create_request('getplayerstatus', [player_id])
         return data
 
-    def get_match_history(self, player_id: list) -> list:
+    def get_match_history(self, player_id: List[str]) -> list:
         """Gets recent matches and high level match statistics for a particular player"""
         data = self._create_request('getmatchhistory', [player_id])
         return data
+
+    def get_matchids_by_queue(self, queue: List[str], date: List[str], hour: List[str]) -> list:
+        """Lists all Match IDs for a particular Match Queue"""
+        data = self._create_request('getmatchidsbyqueue', [queue, date, hour])
+        return data
+
+    def get_match_details(self, match_id: List[str]) -> list:
+        """Returns the statistics for a particular completed match"""
+        data = self._create_request('getmatchdetails', [match_id])
+        return data
+
+    def get_queue_stats(self, player_id: List[str], queue: List[str]):
+        """Returns match summary statistics for a (player, queue) combination grouped by gods played"""
+        data = self._create_request('getqueuestats', [player_id, queue])
+        return data
+
+    def get_top_matches(self):
+        """Lists the 50 most watched / most recent recorded matches"""
+        data = self._create_request('gettopmatches')
+        return data
+
