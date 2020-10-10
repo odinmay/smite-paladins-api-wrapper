@@ -29,7 +29,7 @@ class SmiteAPI:
 
     @staticmethod
     def _create_timestamp() -> str:
-        """Creates the current timestamp formatted properly"""
+        """Returns the current timestamp formatted properly"""
         current_datetime = datetime.utcnow()
         return current_datetime.strftime("%Y%m%d%H%M%S")
 
@@ -180,7 +180,7 @@ class SmiteAPI:
         data = self._create_request('getmatchdetails', [match_id])
         return data
 
-    def get_queue_stats(self, player_id: List[str], queue: List[str]):
+    def get_queue_stats(self, player_id: List[str], queue: List[str]) -> list:
         """Returns match summary statistics for a (player, queue) combination grouped by gods played"""
         data = self._create_request('getqueuestats', [player_id, queue])
         return data
@@ -190,3 +190,38 @@ class SmiteAPI:
         data = self._create_request('gettopmatches')
         return data
 
+    def get_league_seasons(self, queue: List[str]) -> list:
+        """Provides a list of seasons and rounds (including the single active season) for a match queue"""
+        data = self._create_request('getleagueseasons', [queue])
+        return data
+
+    def get_league_leaderboard(self, queue: List[str], tier: List[str], round: List[str]) -> list:
+        """Returns the top players for a particular league (as indicated by the queue/tier/round parameters).
+        Note: the “Season” for which the Round is associated is by default the current/active Season"""
+        data = self._create_request('getleagueleaderboard', [queue, tier, round])
+        return data
+
+    def get_team_details(self, clan_id: List[str]) -> list:
+        """Lists the number of players and other high level details for a particular clan"""
+        data = self._create_request('getteamdetails', [clan_id])
+        return data
+
+    def get_team_players(self, clan_id: List[str]) -> list:
+        """Lists the players for a particular clan"""
+        data = self._create_request('getteamplayers', [clan_id])
+        return data
+
+    def search_teams(self, clan_name: List[str]) -> list:
+        """Returns high level information for Clan names containing the Clan name"""
+        data = self._create_request('searchteams', [clan_name])
+        return data
+
+    def get_esports_proleague_details(self) -> list:
+        """Returns the matchup information for each matchup for the current eSports Pro League season."""
+        data = self._create_request('getesportsproleaguedetails')
+        return data
+
+    def get_motd(self) -> list:
+        """Returns information about the 20 most recent Match-of-the-Days"""
+        data = self._create_request('getmotd')
+        return data
