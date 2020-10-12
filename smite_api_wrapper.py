@@ -4,27 +4,16 @@ import hashlib
 import json
 from typing import List
 
-
 devId = 'YOUR DEV ID'
 authKey = 'YOUR AUTH KEY'
 
 
-class SmiteAPI:
-    base_url = 'http://api.smitegame.com/smiteapi.svc/'
+class HiRezAPI:
     response_frmt = 'Json'
 
-    def __init__(self, dev_id: str, auth_key: str):
-        """Session is not created until a request is made"""
-        self.dev_id = dev_id
-        self.auth_key = auth_key
-        self.base_url = SmiteAPI.base_url
-        self.session_id = None
-        self.lang_code = '1'
-
-    @staticmethod
-    def ping() -> str:
+    def ping(self) -> str:
         """A quick way of validating access to the Hi-Rez API"""
-        data = requests.get(f'{SmiteAPI.base_url}/ping{SmiteAPI.response_frmt}')
+        data = requests.get(f'{self.base_url}/ping{HiRezAPI.response_frmt}')
         return data.text
 
     @staticmethod
@@ -52,7 +41,7 @@ class SmiteAPI:
             self._create_session()
             return True
         else:
-            url = f"{self.base_url}testsession{SmiteAPI.response_frmt}/{self.dev_id}/" \
+            url = f"{self.base_url}testsession{HiRezAPI.response_frmt}/{self.dev_id}/" \
                   f"{self._create_signature('testsession')}/{self.session_id}/{self._create_timestamp()}"
             req = requests.get(url)
             if 'successful' in req.text:
@@ -76,7 +65,7 @@ class SmiteAPI:
         """Builds and returns the url to be requested when given the parameters and methodname"""
         signature = self._create_signature(methodname)
         timestamp = self._create_timestamp()
-        partial_url = [methodname + SmiteAPI.response_frmt, self.dev_id, signature, self.session_id, timestamp]
+        partial_url = [methodname + HiRezAPI.response_frmt, self.dev_id, signature, self.session_id, timestamp]
         if params:
             for param in params:
                 if type(param) == list:
@@ -84,6 +73,68 @@ class SmiteAPI:
                 else:
                     partial_url.append(str(param))
         return self.base_url + '/'.join(partial_url)
+
+
+class PaladinsAPI(HiRezAPI):
+    base_url = 'http://api.paladins.com/paladinsapi.svc/'
+
+    def __init__(self, dev_id: str, auth_key: str):
+        """Session is not created until a request is made"""
+        self.dev_id = dev_id
+        self.auth_key = auth_key
+        self.base_url = PaladinsAPI.base_url
+        self.session_id = None
+        self.lang_code = '1'
+
+    def get_champions(self) -> list:
+        """Returns all Champions and their various attributes"""
+        data = self._create_request('getchampions', [self.lang_code])
+        return data
+
+    def get_champion_cards(self, champion_id: List[str]) -> list:
+        """Returns all Champion cards"""
+        data = self._create_request('getchampioncards', [champion_id, self.lang_code])
+        return data
+
+    def get_champion_leaderboard(self, champion_id: List[str], queue: List[str]) -> list:
+        """Returns the current season’s leaderboard for a champion/queue combination"""
+        data = self._create_request('getchampionleaderboard', [champion_id, queue])
+        return data
+
+    def get_champion_skins(self, champion_id: List[str]) -> list:
+        """Returns all available skins for a particular Champion"""
+        data = self._create_request('getchampionskins', [champion_id, self.lang_code])
+        return data
+
+    def get_champion_ranks(self, player_id: List[str]) -> list:
+        """Returns the Rank and Worshippers value for each Champion a player has played"""
+        data = self._create_request('getchampionranks', [player_id])
+        return data
+
+    def get_player_loadouts(self, player_id: List[str]) -> list:
+        """Returns deck loadouts per Champion"""
+        data = self._create_request('getplayerloadouts', [player_id, self.lang_code])
+        return data
+
+    def get_player_id(self, player_name: List[str]) -> list:
+        """Returns a player id, which is used for other function calls"""
+        data = self._create_request('getplayeridbyname', [player_name])
+        try:
+            return [data[0]['player_id']]
+        except KeyError and IndexError:
+            print('Player not found')
+
+
+class SmiteAPI(HiRezAPI):
+    base_url = 'http://api.smitegame.com/smiteapi.svc/'
+
+    def __init__(self, dev_id: str, auth_key: str):
+        """Session is not created until a request is made"""
+        self.dev_id = dev_id
+        self.auth_key = auth_key
+        self.base_url = SmiteAPI.base_url
+        self.session_id = None
+        self.lang_code = '1'
 
     def get_data_used(self) -> list:
         """Returns API Developer daily usage limits and the current status against those limits"""
