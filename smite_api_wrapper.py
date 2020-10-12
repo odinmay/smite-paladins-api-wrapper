@@ -9,12 +9,8 @@ authKey = 'YOUR AUTH KEY'
 
 
 class HiRezAPI:
+    """Class containing session generation, and shared endpoint functions"""
     response_frmt = 'Json'
-
-    def ping(self) -> str:
-        """A quick way of validating access to the Hi-Rez API"""
-        data = requests.get(f'{self.base_url}/ping{HiRezAPI.response_frmt}')
-        return data.text
 
     @staticmethod
     def _create_timestamp() -> str:
@@ -73,6 +69,112 @@ class HiRezAPI:
                 else:
                     partial_url.append(str(param))
         return self.base_url + '/'.join(partial_url)
+
+    def ping(self) -> str:
+        """A quick way of validating access to the Hi-Rez API"""
+        data = requests.get(f'{self.base_url}/ping{HiRezAPI.response_frmt}')
+        return data.text
+
+    def get_data_used(self) -> list:
+        """Returns API Developer daily usage limits and the current status against those limits"""
+        data = self._create_request('getdataused')
+        return data
+
+    def get_server_status(self) -> list:
+        """Function returns UP/DOWN status for the primary game/platform environments
+          Data is cached once a minute"""
+        data = self._create_request('gethirezserverstatus')
+        return data
+
+    def get_patch_info(self) -> dict:
+        """Function returns information about current deployed patch.
+         Currently, this information only includes patch version"""
+        data = self._create_request('getpatchinfo')
+        return data
+
+    def get_items(self) -> list:
+        """Returns all Items and their various attributes"""
+        data = self._create_request('getitems', [self.lang_code])
+        return data
+
+    def get_player(self, player_name: List[str]) -> list:
+        """Returns league and other high level data for a particular player"""
+        data = self._create_request('getplayer', [player_name])
+        return data
+
+    def get_player_id(self, player_name: List[str]) -> list:
+        """Returns a player id, which is used for other function calls"""
+        data = self._create_request('getplayeridbyname', [player_name])
+        try:
+            return [data[0]['player_id']]
+        except KeyError:
+            print('Player not found')
+
+    def search_players(self, player_name: List[str]) -> list:
+        """Returns player_id values for all names and/or gamer_tags containing the “searchPlayer” string"""
+        data = self._create_request('searchplayers', [player_name])
+        return data
+
+    def get_friends(self, player_id: List[str]) -> list:
+        """Returns the Smite User names of each of the player’s friends. [PC only]"""
+        data = self._create_request('getfriends', [player_id])
+        return data
+
+    def get_player_status(self, player_id: List[str]) -> list:
+        """Returns players current online status"""
+        data = self._create_request('getplayerstatus', [player_id])
+        return data
+
+    def get_match_history(self, player_id: List[str]) -> list:
+        """Gets recent matches and high level match statistics for a particular player"""
+        data = self._create_request('getmatchhistory', [player_id])
+        return data
+
+    def get_matchids_by_queue(self, queue: List[str], date: List[str], hour: List[str]) -> list:
+        """Lists all Match IDs for a particular Match Queue"""
+        data = self._create_request('getmatchidsbyqueue', [queue, date, hour])
+        return data
+
+    def get_match_details(self, match_id: List[str]) -> list:
+        """Returns the statistics for a particular completed match"""
+        data = self._create_request('getmatchdetails', [match_id])
+        return data
+
+    def get_queue_stats(self, player_id: List[str], queue: List[str]) -> list:
+        """Returns match summary statistics for a (player, queue) combination grouped by gods played"""
+        data = self._create_request('getqueuestats', [player_id, queue])
+        return data
+
+    def get_top_matches(self):
+        """Lists the 50 most watched / most recent recorded matches"""
+        data = self._create_request('gettopmatches')
+        return data
+
+    def get_league_seasons(self, queue: List[str]) -> list:
+        """Provides a list of seasons and rounds (including the single active season) for a match queue"""
+        data = self._create_request('getleagueseasons', [queue])
+        return data
+
+    def get_league_leaderboard(self, queue: List[str], tier: List[str], round: List[str]) -> list:
+        """Returns the top players for a particular league (as indicated by the queue/tier/round parameters).
+        Note: the “Season” for which the Round is associated is by default the current/active Season"""
+        data = self._create_request('getleagueleaderboard', [queue, tier, round])
+        return data
+
+    def get_team_details(self, clan_id: List[str]) -> list:
+        """Lists the number of players and other high level details for a particular clan"""
+        data = self._create_request('getteamdetails', [clan_id])
+        return data
+
+    def get_team_players(self, clan_id: List[str]) -> list:
+        """Lists the players for a particular clan"""
+        data = self._create_request('getteamplayers', [clan_id])
+        return data
+
+    def get_esports_proleague_details(self) -> list:
+        """Returns the matchup information for each matchup for the current eSports Pro League season."""
+        data = self._create_request('getesportsproleaguedetails')
+        return data
 
 
 class PaladinsAPI(HiRezAPI):
@@ -136,23 +238,6 @@ class SmiteAPI(HiRezAPI):
         self.session_id = None
         self.lang_code = '1'
 
-    def get_data_used(self) -> list:
-        """Returns API Developer daily usage limits and the current status against those limits"""
-        data = self._create_request('getdataused')
-        return data
-
-    def get_server_status(self) -> list:
-        """Function returns UP/DOWN status for the primary game/platform environments
-          Data is cached once a minute"""
-        data = self._create_request('gethirezserverstatus')
-        return data
-
-    def get_patch_info(self) -> dict:
-        """Function returns information about current deployed patch.
-         Currently, this information only includes patch version"""
-        data = self._create_request('getpatchinfo')
-        return data
-
     def get_gods(self) -> list:
         """Returns all Gods and their various attributes"""
         data = self._create_request('getgods', [self.lang_code])
@@ -173,34 +258,6 @@ class SmiteAPI(HiRezAPI):
         data = self._create_request('getgodrecommendeditems', [god_id, self.lang_code])
         return data
 
-    def get_items(self) -> list:
-        """Returns all Items and their various attributes"""
-        data = self._create_request('getitems', [self.lang_code])
-        return data
-
-    def get_player(self, player_name: List[str]) -> list:
-        """Returns league and other high level data for a particular player"""
-        data = self._create_request('getplayer', [player_name])
-        return data
-
-    def search_players(self, player_name: List[str]) -> list:
-        """Returns player_id values for all names and/or gamer_tags containing the “searchPlayer” string"""
-        data = self._create_request('searchplayers', [player_name])
-        return data
-
-    def get_player_id(self, player_name: List[str]) -> list:
-        """Returns a player id, which is used for other function calls"""
-        data = self._create_request('getplayeridbyname', [player_name])
-        try:
-            return [data[0]['player_id']]
-        except KeyError:
-            print('Player not found')
-
-    def get_friends(self, player_id: List[str]) -> list:
-        """Returns the Smite User names of each of the player’s friends. [PC only]"""
-        data = self._create_request('getfriends', [player_id])
-        return data
-
     def get_god_ranks(self, player_id: List[str]) -> list:
         """Returns the Rank and Worshippers value for each God a player has played"""
         data = self._create_request('getgodranks', [player_id])
@@ -211,65 +268,9 @@ class SmiteAPI(HiRezAPI):
         data = self._create_request('getplayerachievements', [player_id])
         return data
 
-    def get_player_status(self, player_id: List[str]) -> list:
-        """Returns players current online status"""
-        data = self._create_request('getplayerstatus', [player_id])
-        return data
-
-    def get_match_history(self, player_id: List[str]) -> list:
-        """Gets recent matches and high level match statistics for a particular player"""
-        data = self._create_request('getmatchhistory', [player_id])
-        return data
-
-    def get_matchids_by_queue(self, queue: List[str], date: List[str], hour: List[str]) -> list:
-        """Lists all Match IDs for a particular Match Queue"""
-        data = self._create_request('getmatchidsbyqueue', [queue, date, hour])
-        return data
-
-    def get_match_details(self, match_id: List[str]) -> list:
-        """Returns the statistics for a particular completed match"""
-        data = self._create_request('getmatchdetails', [match_id])
-        return data
-
-    def get_queue_stats(self, player_id: List[str], queue: List[str]) -> list:
-        """Returns match summary statistics for a (player, queue) combination grouped by gods played"""
-        data = self._create_request('getqueuestats', [player_id, queue])
-        return data
-
-    def get_top_matches(self):
-        """Lists the 50 most watched / most recent recorded matches"""
-        data = self._create_request('gettopmatches')
-        return data
-
-    def get_league_seasons(self, queue: List[str]) -> list:
-        """Provides a list of seasons and rounds (including the single active season) for a match queue"""
-        data = self._create_request('getleagueseasons', [queue])
-        return data
-
-    def get_league_leaderboard(self, queue: List[str], tier: List[str], round: List[str]) -> list:
-        """Returns the top players for a particular league (as indicated by the queue/tier/round parameters).
-        Note: the “Season” for which the Round is associated is by default the current/active Season"""
-        data = self._create_request('getleagueleaderboard', [queue, tier, round])
-        return data
-
-    def get_team_details(self, clan_id: List[str]) -> list:
-        """Lists the number of players and other high level details for a particular clan"""
-        data = self._create_request('getteamdetails', [clan_id])
-        return data
-
-    def get_team_players(self, clan_id: List[str]) -> list:
-        """Lists the players for a particular clan"""
-        data = self._create_request('getteamplayers', [clan_id])
-        return data
-
     def search_teams(self, clan_name: List[str]) -> list:
         """Returns high level information for Clan names containing the Clan name"""
         data = self._create_request('searchteams', [clan_name])
-        return data
-
-    def get_esports_proleague_details(self) -> list:
-        """Returns the matchup information for each matchup for the current eSports Pro League season."""
-        data = self._create_request('getesportsproleaguedetails')
         return data
 
     def get_motd(self) -> list:
