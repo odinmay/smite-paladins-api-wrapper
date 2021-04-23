@@ -3,9 +3,10 @@ from datetime import datetime
 import hashlib
 import json
 from typing import List
+import os
 
-devId = 'YOUR DEV ID'
-authKey = 'YOUR AUTH KEY'
+devId = os.environ.get('HIREZ_DEVID')
+authKey = os.environ.get('HIREZ_AUTH')
 
 
 class HiRezAPI:
@@ -218,13 +219,10 @@ class PaladinsAPI(HiRezAPI):
         data = self._create_request('getplayerloadouts', [player_id, self.lang_code])
         return data
 
-    def get_player_id(self, player_name: List[str]) -> list:
-        """Returns a player id, which is used for other function calls"""
-        data = self._create_request('getplayeridbyname', [player_name])
-        try:
-            return [data[0]['player_id']]
-        except KeyError and IndexError:
-            print('Player not found')
+    def get_bounty_items(self,) -> str:
+        """Returns daily Bounty Item history for the past 6 months."""
+        data = self._create_request('getbountyitems')
+        return data
 
 
 class SmiteAPI(HiRezAPI):
