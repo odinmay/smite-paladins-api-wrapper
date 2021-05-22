@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <!-- Bootstrap css -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <title>Python Hirez API Wrapper</title>
+
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+        #smiteclasscol {
+            border-left: 1px solid lightgray;
+        }
+        #examplecode {
+            background-color: #dcdcdc;
+        }
+        code {
+            font-size: 18px;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="container-fluid">
+
+    <!-- Header Rows -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-md-12 align-items-center py-2 mt-2"  style="background-color: #eeeeee;">
+            <h2 class="display-4 text-center my-2"><strong>Smite/Paladins API Wrapper</strong></h2>
+            <hr>
+            <p class="lead text-center my-auto px-5" style="font-size: 24px"><strong>With this script you can use 2 classes: <strong>SmiteAPI( )</strong> or <strong>PaladinsAPI( )</strong> to create requests to the HiRez API in a straightforward and clear way. All methods will return data in <em>json</em> format. Both classes inherit all of the methods from the parent class <strong>HiRezAPI( )</strong> and each has its own exclusive methods listed below</strong>
+        </div>
+    </div>
+
+    <!-- Example Usage Row -->
+    <div class="row justify-content-center my-2">
+        <div class="col-lg-10 col-md-12 text-center pb-4 pt-2" style="background-color: #eeeeee;">
+            <h1 class="display-6">Example Usage</h1>
+            <hr>
+            <br>
+            <p><code id="examplecode">api = SmiteAPI(dev_id, auth_key)</code></p>
+            <p><code id="examplecode">god_data = api.get_gods( )</code></p>
+            <br>
+            <hr>
+            <p style="font-size: 24px">Or if you want Paladins data</p>
+            <hr>
+            <br>
+            <p><code id="examplecode">api = PaladinsAPI(dev_id, auth_key)</code></p>
+            <p><code id="examplecode">champion_data = api.get_champions( )</code></p>
+            <br>
+            <hr>
+            <p style="font-size: 24px">Arguments are always Lists containing Strings unless there are no args</p>
+            <hr>
+            <br>
+            <p><code id="examplecode">api = SmiteAPI(dev_id, auth_key)</code></p>
+            <p><code id="examplecode">player_id = api.get_player_id(["USERNAME"])</code></p>
+            <p><code id="examplecode">match_history_json = api.get_match_history([player_id])</code></p>
+        </div>
+    </div>
+
+    <!-- 2 Column SMITE/PALADINS Methods-->
+    <div class="row justify-content-center">
+
+        <div class="col-lg-5 col-md-6" id="test" style="background-color: #eeeeee">
+            <div class="row">
+                <div class="col-12 height-auto">
+                    <h1 class="display-5 text-center mt-1 mb-4 pt-1">PaladinsAPI( )</h1>
+                    <hr class="pb-3">
+                    <div class="font-weight-normal text-center">
+                        <p><code>get_champions( )</code> <br> <strong>Returns all Champions and their various attributes</strong></p>
+                        <hr>
+                        <p><code>get_champion_cards( )</code> <br> <strong>Returns all Champion cards</strong></p>
+                        <hr>
+                        <p><code>get_champion_leaderboard( )</code> <br> <strong>Returns the current season’s leaderboard for a champion/queue combination</strong></p>
+                        <hr>
+                        <p><code>get_champion_skins( )</code> <br> <strong>Returns all available skins for a particular Champion</strong></p>
+                        <hr>
+                        <p><code>get_champion_ranks( )</code> <br> <strong>Returns the Rank and Worshippers value for each Champion a player has played</strong></p>
+                        <hr>
+                        <p><code>get_player_loadouts( )</code> <br> <strong>Returns deck loadouts per Champion</strong></p>
+                        <hr>
+                        <p><code>get_bounty_items( )</code> <br> <strong>Returns daily Bounty Item history for the past 6 months.</strong></p>
+                        <hr>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5 col-md-6" id="smiteclasscol" style="background-color: #eeeeee">
+            <div class="row">
+                <div class="col-12 pb-2">
+                    <h1 class="display-5 text-center mt-1 mb-4 pt-1">SmiteAPI( )</h1>
+                    <hr class="pb-3">
+                    <div class="font-weight-normal text-center">
+                        <p><code>get_gods( )</code> <br> <strong>Returns all Gods and their various attributes</strong></p>
+                        <hr>
+                        <p><code>get_god_skins( )</code> <br> <strong>Returns all available skins for a particular God</strong></p>
+                        <hr>
+                        <p><code>get_god_leaderboard( )</code> <br> <strong>Returns the current season’s leaderboard for a god/queue combination</strong></p>
+                        <hr>
+                        <p><code>get_god_recommended_items( )</code> <br> <strong>Returns the Recommended Items for a particular God</strong></p>
+                        <hr>
+                        <p><code>get_god_ranks( )</code> <br> <strong>Returns the Rank and Worshippers value for each God a player has played</strong></p>
+                        <hr>
+                        <p><code>get_player_achievements( )</code> <br> <strong>Returns select achievement totals for the specified playerId</strong></p>
+                        <hr>
+                        <p><code>search_teams( )</code> <br> <strong>Returns high level information for Clan names containing the Clan name</strong></p>
+                        <hr>
+                        <p><code>get_motd( )</code> <br> <strong>Returns information about the 20 most recent Match-of-the-Days</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared Methods Row -->
+    <div class="row justify-content-center my-2">
+        <div class="col-lg-10 col-md-12 text-center" style="background-color: #eeeeee">
+            <h1 class="display-5">Shared Methods</h1>
+            <hr class="pb-3">
+
+            <!-- 3 Sub Columns Below Shared Method row -->
+            <div class="row">
+
+                <div class="col-lg-4 col-md-12 justify-content-center">
+                    <p><code>ping( )</code> <br> <strong>A quick way of validating access to the Hi-Rez API</strong></p><br>
+                    <hr>
+                    <p><code>get_patch_info( )</code> <br> <strong>Function returns information about current deployed patch.
+                        Currently, this information only includes patch version</strong></p><br>
+                    <hr>
+                    <p><code>get_player_id( )</code> <br> <strong>Returns a player id, which is used for other function calls</strong></p><br>
+                    <hr>
+                    <p><code>get_player_status( )</code> <br> <strong>Returns players current online status</strong></p><br>
+                    <hr>
+                    <p><code>get_match_details( )</code> <br> <strong>Returns the statistics for a particular completed match</strong></p><br>
+                    <hr>
+                    <p><code>get_league_seasons( )</code> <br> <strong>Provides a list of seasons and rounds (including the single active season) for a match queue</strong></p><br>
+                    <hr>
+                    <p><code>get_team_players( )</code> <br> <strong>Lists the players for a particular clan</strong></p><br>
+                    <hr>
+                </div>
+
+                <div class="col-lg-4 col-md-12 justify-content-center">
+                    <p><code>get_data_used( )</code> <br> <strong>Returns API Developer daily usage limits and the current status against those limits</strong></p>
+                    <hr>
+                    <p><code>get_items( )</code> <br> <strong>Returns all Items and their various attributes</strong></p><br>
+                    <hr>
+                    <p><code>search_players( )</code> <br> <strong>Returns player_id values for all names and/or gamer_tags containing the “searchPlayer” string</strong></p><br>
+                    <hr>
+                    <p><code>get_match_history( )</code> <br> <strong>Gets recent matches and high level match statistics for a particular player</strong></p><br>
+                    <hr>
+                    <p><code>get_queue_stats( )</code> <br> <strong>Returns match summary statistics for a (player, queue) combination grouped by gods played</strong></p><br>
+                    <hr>
+                    <p><code>get_league_leaderboard( )</code> <br> <strong>Returns the top players for a particular league (as indicated by the queue/tier/round parameters).
+                        Note: the “Season” for which the Round is associated is by default the current/active Season</strong></p><br>
+                    <hr>
+                </div>
+
+                <div class="col-lg-4 col-md-12 justify-content-center">
+                    <p><code>get_server_status( )</code> <br> <strong>Function returns UP/DOWN status for the primary game/platform environments
+                        Data is cached once a minute</strong></p>
+                    <hr>
+                    <p><code>get_player( )</code> <br> <strong>Returns league and other high level data for a particular player</strong></p><br>
+                    <hr>
+                    <p><code>get_friends( )</code> <br> <strong>Returns the Smite User names of each of the player’s friends [PC only]</strong></p><br>
+                    <hr>
+                    <p><code>get_matchids_by_queue( )</code> <br> <strong>Lists all Match IDs for a particular Match Queue</strong></p><br>
+                    <hr>
+                    <p><code>get_top_matches( )</code> <br> <strong>Lists the 50 most watched / most recent recorded matches</strong></p><br>
+                    <hr>
+                    <p><code>get_team_details( )</code> <br> <strong>Lists the number of players and other high level details for a particular clan</strong></p><br>
+                    <hr>
+                    <p><code>get_esports_proleague_details( )</code> <br> <strong>Returns the matchup information for each matchup for the current eSports Pro League season</strong></p><br>
+                    <hr>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Javascript for bootstrap -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</body>
+</html>
