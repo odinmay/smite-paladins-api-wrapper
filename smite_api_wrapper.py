@@ -5,8 +5,8 @@ import json
 from typing import List
 import os
 
-devId = os.environ.get('HIREZ_DEVID')
-authKey = os.environ.get('HIREZ_AUTH')
+devId = os.getenv('HIREZ_DEVID')
+authKey = os.getenv('HIREZ_AUTHKEY')
 
 
 class HiRezAPI:
@@ -38,23 +38,21 @@ class HiRezAPI:
             self._create_session()
             return True
         else:
-            url = f"{self.base_url}testsession{HiRezAPI.response_frmt}/{self.dev_id}/" \
+            url = f"{self.base_url}testsession{self.response_frmt}/{self.dev_id}/" \
                   f"{self._create_signature('testsession')}/{self.session_id}/{self._create_timestamp()}"
             req = requests.get(url)
             if 'successful' in req.text:
                 return True
             else:
                 self._create_session()
-                print('Restarting session')
                 return True
 
     def _create_request(self, methodname: str, params=None):
         """Takes the method and parameters which are then built into a url and requested, returns json"""
         if self._test_session():
             url = self._create_url(methodname, params)
-            print(url)
             req = requests.get(url)
-            return json.loads(req.text, encoding='utf-8')
+            return json.loads(req.text)
         else:
             self._create_session()
 
@@ -179,7 +177,7 @@ class HiRezAPI:
 
 
 class PaladinsAPI(HiRezAPI):
-    base_url = 'http://api.paladins.com/paladinsapi.svc/'
+    base_url = 'https://api.paladins.com/paladinsapi.svc/'
 
     def __init__(self, dev_id: str, auth_key: str):
         """Session is not created until a request is made"""
@@ -226,7 +224,7 @@ class PaladinsAPI(HiRezAPI):
 
 
 class SmiteAPI(HiRezAPI):
-    base_url = 'http://api.smitegame.com/smiteapi.svc/'
+    base_url = 'https://api.smitegame.com/smiteapi.svc/'
 
     def __init__(self, dev_id: str, auth_key: str):
         """Session is not created until a request is made"""
@@ -274,4 +272,8 @@ class SmiteAPI(HiRezAPI):
     def get_motd(self) -> list:
         """Returns information about the 20 most recent Match-of-the-Days"""
         data = self._create_request('getmotd')
+        return data
+
+    def get_god_alt_abilities(self):
+        data = self._create_request('getgodaltabilities')
         return data
