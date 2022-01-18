@@ -35,3 +35,20 @@ api.get_champions()
 
 ## Example Usage
 Included is the `god_csv.py` file, this give an example of using the api wrapper to fetch data and then process it to a csv file
+You can then graph the data using python all with a few lines of code!
+
+<hr>
+
+![Assassins_Health Graph](charts/Assassins_Health.png)
+<hr>
+
+![Guardian_Health Graph](charts/Guardian_Health.png)
+<hr>
+
+![Hunter_Health Graph](charts/Hunter_Health.png)
+<hr>
+
+![Mage_Health Graph](charts/Mage_Health.png)
+<hr>
+
+![Warrior_Health Graph](charts/Warrior_Health.png)
